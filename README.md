@@ -1,0 +1,11 @@
+Simple script to music play on terminal and stream using youtube links. (probably more in the future)
+
+### Dependencies:
+- mpv
+- yt-dlp
+- fzf
+
+why use this? well it's lighter than streaming music from your favorite browser.
+
+and don't forget to run:
+`sudo ln -s ~/path/to/your/script /usr/local/bin/music`

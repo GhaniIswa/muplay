@@ -1,0 +1,36 @@
+#!/usr/bin/env zsh
+
+for cmd in fzf yt-dlp mpv; do
+    if ! (( $+commands[$cmd] )); then
+        echo "Error: Required command '$cmd' is not installed." >&2
+        exit 1
+    fi
+done
+
+if [[ $# -eq 0 ]]; then
+    echo -n "Insert title: "
+    read -r user_query
+    [[ -z "$user_query" ]] && exit 0
+else
+    user_query="$*"
+fi
+
+echo "Searching: $user_query..."
+
+selected=$(yt-dlp "ytsearch10:$user_query" --flat-playlist \
+    --print $'%(title)s\t%(id)s' 2>/dev/null |
+    fzf --delimiter=$'\t' --with-nth=1 --prompt="Choose song > " --height=40% --layout=reverse)
+
+[[ -z "$selected" ]] && exit 0
+video_id=${selected##*$'\t'}
+
+    clear
+    echo "Loading please wait..."
+
+YT_CLIENT="android"
+
+exec mpv --no-video \
+    --ytdl-format='bestaudio/best' \
+    --ytdl-raw-options=yes-playlist=,playlist-end=50,extractor-args=youtube:player_client=$YT_CLIENT \
+    --loop-playlist=inf \
+    "https://www.youtube.com/watch?v=${video_id}&list=RD${video_id}&start_radio=1"
